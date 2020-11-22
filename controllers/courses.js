@@ -172,8 +172,6 @@ exports.updateCourse = async (req,res,next) => {
 exports.deleteCourse = async (req, res, next) => {
   const course = await Course.findById(req.params.courseId);
 
-  console.log(course)
-
   // make sure course exist
   if (course === null) {
       return next(
@@ -181,11 +179,28 @@ exports.deleteCourse = async (req, res, next) => {
       )
   }
 
+
   try {
+    /**
+     * TO DO
+     * check if a student is registered for the course and prevent its deleting
+     */
+    const stdCourses = await Student.find({});
+
+    stdCourses.map(async item => {
+      let cs;
+        item.courses.forEach(crs => {
+          if (crs.toString() === req.params.courseId.toString()) {
+            // item.courses.splice((item.courses.indexOf(crs)), 1);
+            return next(new ErrorResponse('there is a student registered for this course so it cant be deleted',400))
+          }
+        })
+      // await Student.findOneAndUpdate(item._id, {item.courses});
+    });
+    
     await course.remove();
     res.status(200).json({ success: true, data: {} });
   } catch (error) {
-
     return next(
       new ErrorResponse(`could not delete course at the moment, please try again`, 500)
     )

@@ -21,6 +21,13 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true,'please enter a password'],
     },
+    photo: {
+        type: String,
+        default:'no_photo.jpg'
+    },
+    experience: {
+        type: String
+    },
     resetPasswordToken: { type: String },
     resetPasswordExpire:{type: Date},
     role: {
@@ -29,16 +36,21 @@ const UserSchema = new mongoose.Schema({
         default: 'student'
     }
 }, {
-    timestamps: true,
-}, {
         toJSON: { virtuals:true },
         toObject: { virtuals:true }
 });
-
+//get all reviews by this user
 UserSchema.virtual('reviews', {
     ref: 'Review',
     localField: '_id',
     foreignField: 'user'
+    
+});
+//get all courses registered by this user
+UserSchema.virtual('courses', {
+    ref: 'Student',
+    localField: '_id',
+    foreignField: 'studentId'
     
 });
 

@@ -14,7 +14,7 @@ const {
 router.route('/').get(getReviews);
 
 router.route('/:courseId/reviews').post(protect, addReview);
-router.route('/:reviewId/review').get(getReview);
+router.route('/:reviewId').get(getReview);
 router.route('/:reviewId/update').put(protect,updateReview);
 router.route('/:reviewId/delete').delete(protect,deleteReview);
 

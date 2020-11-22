@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const { findOne } = require('../models/User');
-
 
 // @desc      Create user
 // @route     POST /api/v1/auth/register
@@ -14,7 +12,7 @@ exports.register = async (req, res, next) => {
 
     const salt = await bcrypt.genSalt(10);
 
-    const hashPassword = await bcrypt.hashSync(req.body.password, salt);
+    const hashPassword = bcrypt.hashSync(req.body.password, salt);
 
     const password = hashPassword
 
@@ -28,10 +26,10 @@ exports.register = async (req, res, next) => {
         })
         
     } catch (e) {
-        res.status(400).json({
-            success: false,
-            msg: e.message
-        })
+
+        next(
+            new ErrorResponse("sorry we could not register you now . please try again",500)
+        )
         
     }  
 
@@ -54,7 +52,7 @@ exports.login = async (req, res, next) => {
         return next(new ErrorResponse('Invalid credentials', 401));
     }
 
-    const matchPassword = await bcrypt.compareSync(password, user.password);
+    const matchPassword = bcrypt.compareSync(password, user.password);
 
     if (!matchPassword) {
         return next(new ErrorResponse('Invalid credentials', 401));
@@ -67,10 +65,6 @@ exports.login = async (req, res, next) => {
         token
 
     })
-    // "name":"austin",
-    // "email":"a@example.com",
-    // "phone":"123456789",
-    // "password":"qqqqqq"
     
 }
 // @desc      Get forgot password rest token.email will be sent to the user from the frontend and include the reset token
@@ -105,7 +99,7 @@ exports.forgotPassword = async (req,res,next) => {
                 success: true,
                 data: resetToken,
                 expiresIn : user.resetPasswordExpire
-             })
+                })
     } catch (err) {
         next(
             new ErrorResponse(`Sorry Could not generate reset token at this point please try again`,500)

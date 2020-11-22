@@ -1,7 +1,6 @@
 const Review = require('../models/Review');
 const Course = require('../models/Course');
 const ErrorResponse = require('../utils/errorResponse');
-const { remove } = require('../models/Review');
 
 
 // @desc      Add review
@@ -45,7 +44,7 @@ exports.getReviews = async (req, res, next) => {
             select: 'title description'
         }).populate({
             path: 'user',
-            select: 'name email'
+            select: 'name email photo'
         });
 
         res.status(200).json({
@@ -66,11 +65,8 @@ exports.getReview = async (req, res, next) => {
     
     try {
     const review = await Review.findById(req.params.reviewId).populate({
-        path: 'course',
-        select: 'title description'
-        }).populate({
             path: 'user',
-            select: 'name email'
+            select: 'name email photo'
         })
 
         res.status(200).json({
