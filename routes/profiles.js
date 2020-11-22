@@ -4,9 +4,13 @@ const { protect } = require('../middleware/auth');
 
 
 const {
-    getProfile
+    getProfile,
+    updateProfile
 } = require('../controllers/profile');
 
 
-router.route('/').get(protect,getProfile)
+router.route('/:userId')
+    .get(protect, getProfile)
+    .post(protect, updateProfile);
+
 module.exports = router;
