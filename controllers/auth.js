@@ -1,8 +1,9 @@
 const ErrorResponse = require('../utils/errorResponse');
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const sendEmail = require('../utils/sendEmail');
+const generateJwtToken = require('../utils/jwtToken');
 
 // @desc      Create user
 // @route     POST /api/v1/auth/register
@@ -80,7 +81,7 @@ exports.forgotPassword = async (req,res,next) => {
         )
     }
     
-    try {
+    
         //create reset token
         const resetToken = crypto.randomBytes(20).toString('hex');
 
@@ -92,15 +93,33 @@ exports.forgotPassword = async (req,res,next) => {
 
         await user.save();
 
-        //create reset url
-        // const restUrl = `${req.protocol}://${req.get('host')}/api/v1/resetpassword/${resetToken}`
+        const restUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
+
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n ${resetUrl}`;
         
-            res.status(200).json({
-                success: true,
-                data: resetToken,
-                expiresIn : user.resetPasswordExpire
-                })
+    try {
+            await sendEmail({
+            email: user.email,
+            subject: 'Password reset token',
+            message
+            });
+
+        res.status(200).json({
+            success: true,
+            data: 'Email sent',
+            expiresIn : user.resetPasswordExpire
+        });
+        
+            // res.status(200).json({
+            //     success: true,
+            //     data: resetToken,
+            //     expiresIn : user.resetPasswordExpire
+            //     })
     } catch (err) {
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+    await user.save();
         next(
             new ErrorResponse(`Sorry Could not generate reset token at this point please try again`,500)
         )
@@ -158,8 +177,3 @@ exports.resetPassword = async (req, res, next) => {
     }
 }
 
-//method to generate jwt login token
-const generateJwtToken = (id) => {
-    const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
-    return token;
-}
