@@ -1,22 +1,35 @@
 const Review = require('../models/Review');
 const Course = require('../models/Course');
+const Student = require('../models/Student');
 const ErrorResponse = require('../utils/errorResponse');
 
 
 // @desc      Add review
-// @route     POST /api/v1/review/:courseId/reviews
+// @route     POST /api/v1/review/:courseId/review
 // @access    Private
 exports.addReview = async (req,res,next) => {
     req.body.user = req.user.id;
     req.body.course = req.params.courseId;
 
     //confirm course exist
-    course = await Course.findById(req.params.courseId);
+   const course = await Course.findById(req.params.courseId);
 
     if (course === null) {
         return next(
             new ErrorResponse(`Course with id ${courseId} does not exist`, 400)
         );
+    }
+
+    //get reviewing student
+    const student = await Student.findOne({ studentId: req.user.id });
+    
+    //check if they registered for this course
+    const found = student.courses.includes(req.params.courseId);
+
+    if (!found) {
+        return next(
+            new ErrorResponse('This user cannot review this course because they are not registered for the course',400)
+        )
     }
 
     try {
@@ -28,7 +41,7 @@ exports.addReview = async (req,res,next) => {
         })
     } catch (error) {
         next(
-           new ErrorResponse(`Sorry we could not add the review. Please try again`, 500) 
+            new ErrorResponse(`Sorry we could not add the review. Please try again`, 500) 
         )
     }
 

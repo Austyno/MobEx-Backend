@@ -16,6 +16,8 @@ const auth = require('./routes/auth');
 const course = require('./routes/courses');
 const reviews = require('./routes/reviews');
 const profiles = require('./routes/profiles');
+const sponsors = require('./routes/sponsors');
+const requestsponsors = require('./routes/requestsponsorships');
 
 
 
@@ -32,6 +34,8 @@ app.use('/api/v1/auth', auth);
 app.use('/api/v1/courses', course);
 app.use('/api/v1/reviews', reviews);
 app.use('/api/v1/profiles', profiles);
+app.use('/api/v1/sponsors', sponsors);
+app.use('/api/v1/requestsponsors', requestsponsors);
 
 app.use(errorHandler);
 

@@ -183,19 +183,16 @@ exports.deleteCourse = async (req, res, next) => {
   try {
     /**
      * TO DO
-     * check if a student is registered for the course and prevent its deleting
+     * check if there is a student is registered for the course and prevent its deleting
      */
     const stdCourses = await Student.find({});
 
     stdCourses.map(async item => {
-      let cs;
         item.courses.forEach(crs => {
           if (crs.toString() === req.params.courseId.toString()) {
-            // item.courses.splice((item.courses.indexOf(crs)), 1);
             return next(new ErrorResponse('there is a student registered for this course so it cant be deleted',400))
           }
         })
-      // await Student.findOneAndUpdate(item._id, {item.courses});
     });
     
     await course.remove();

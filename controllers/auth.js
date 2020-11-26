@@ -2,7 +2,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const crypto = require('crypto');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const sendEmail = require('../utils/sendEmail');
+// const sendEmail = require('../utils/sendEmail');
 const generateJwtToken = require('../utils/jwtToken');
 
 // @desc      Create user
