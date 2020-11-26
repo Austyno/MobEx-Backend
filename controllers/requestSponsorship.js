@@ -23,8 +23,8 @@ exports.getSponsorship = async (req, res, next) => {
 
     if (courseToRegister === null) {
         return next(
-             new ErrorResponse('The course does not exist',400)
-         )   
+            new ErrorResponse('The course does not exist',400)
+        )   
     }
     
     const studentCode = `${req.user.name}_${crypto.randomBytes(3).toString('hex')}`;

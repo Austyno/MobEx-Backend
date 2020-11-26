@@ -4,18 +4,18 @@ const ErrorResponse = require('../utils/errorResponse');
 
 
 // @desc      Get logged in user profile
-// @route     GET /api/v1/profiles/:userId
+// @route     GET /api/v1/profiles/
 // @access    Private 
 exports.getProfile = async (req, res, next) => {
 
-    if (req.user.id !== req.params.userId) {
+    if (!req.user) {
         return next(
             new ErrorResponse('You are not authorized view this profile',400)
         )
     }
 
     try {
-        const user = await User.findById(req.params.userId).select('-password -role')
+        const user = await User.findById(req.user.id).select('-password -role')
         res.status(200).json({
             success: true,
             data: user
@@ -33,14 +33,14 @@ exports.getProfile = async (req, res, next) => {
 // @access    Private 
 exports.updateProfile = async (req, res, next) => {
     
-    if (req.user.id !== req.params.userId) {
+    if (!req.user.id) {
         return next(
             new ErrorResponse('You are not authorized view this profile',400)
         )
     }
 
     try {
-        const user = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true }).select('-password');
+        const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password');
         
         res.status(200).json({
             success: true,

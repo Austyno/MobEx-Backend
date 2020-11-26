@@ -9,7 +9,7 @@ const {
 } = require('../controllers/profile');
 
 
-router.route('/:userId')
+router.route('/')
     .get(protect, getProfile)
     .post(protect, updateProfile);
 
