@@ -2,7 +2,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const crypto = require('crypto');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-// const sendEmail = require('../utils/sendEmail');
+const sendEmail = require('../utils/sendEmail');
 const generateJwtToken = require('../utils/jwtToken');
 
 // @desc      Create user
@@ -11,9 +11,18 @@ const generateJwtToken = require('../utils/jwtToken');
 exports.register = async (req, res, next) => {
     const { name, email, phone} = req.body;
 
+    //check if user already exist
+    const userExist = await User.findOne({ email });
+
+    if (userExist !== null) {
+        return next(
+            new ErrorResponse(`A user with ${email} already exist`,400)
+        );
+    }
+
     const salt = await bcrypt.genSalt(10);
 
-    const hashPassword = bcrypt.hashSync(req.body.password, salt);
+    const hashPassword = await bcrypt.hash(req.body.password, salt);
 
     const password = hashPassword
 
@@ -35,6 +44,8 @@ exports.register = async (req, res, next) => {
     }  
 
 }
+
+
 
 // @desc      Login User
 // @route     POST /api/v1/auth/login
@@ -68,6 +79,7 @@ exports.login = async (req, res, next) => {
     })
     
 }
+
 // @desc      Get forgot password rest token.email will be sent to the user from the frontend and include the reset token
 // @route     POST /api/v1/auth/forgotpassword
 // @access    Public
